@@ -1,0 +1,23 @@
+{
+  "name": "dsh-mobile-remote",
+  "description": "DSH 手机远程插件：在 harness 的 3080 端口提供 /m 移动端页面，查看全部会话(含冷会话)的状态/目标/待办/最近动态，并从手机发送提示注入已挂载会话。",
+  "version": "1.1.0",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "README.md"
+  ],
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "mobile",
+    "remote"
+  ]
+}
