@@ -1,69 +1,97 @@
 # dsh-mobile-remote
 
-手机远程控制 DeepSeek Harness：在 harness 的 3080 端口提供移动端页面，查看全部会话（含冷会话）的状态、目标、待办、最近动态，并从手机发送提示注入「已挂载」会话。
+A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin that adds a mobile remote console — view sessions, goals, todos and recent activity, and send prompts to the agent from your phone.
 
-## 路由
+## Features
 
-| 路由 | 说明 |
-|---|---|
-| `GET /m` | 移动端页面 |
-| `GET /m/state` | 会话列表；`?session=<id>` 取单会话详情 |
-| `POST /m/prompt` | 注入提示，body：`{"sessionId":"...","text":"..."}` |
+- 📱 Mobile-first web console served at `/m` on the existing Harness web port.
+- 🗂 Lists **all** sessions (live and cold) with titles and status.
+- 🎯 Shows the current goal (objective, phase, rounds) and the todo list.
+- 🕘 Renders recent activity as Markdown (headings, code blocks, lists, links…).
+- 💬 Sends prompts to a live session via `agent.followup`.
+- ⚡ Tap a cold session to mount (resume) it and take control.
+- 🔐 Token authentication on every route.
 
-所有路由都要求 `?t=<token>` 认证。
+## Install
 
-## 配置
+### Via `dsh plugin`
 
-默认 token 为 `mob-9e7c5a3b1f`，可在挂载行用 `config.token` 覆盖：
+```bash
+dsh plugin --profile web add <spec>   # e.g. github:<user>/dsh-mobile-remote
+```
+
+The package ships a `dsh.bundle.patch` (`cordis.patch.yml`), so adding it as a bundle self-registers the host row.
+
+### Manual
+
+1. Add the dependency to the profile's `package.json`:
+
+```json
+"dependencies": {
+  "dsh-mobile-remote": "file:<path-to-this-repo>"
+}
+```
+
+2. Link it and mount the row (profile dir: `~/.dsh/profiles/web` on Linux/macOS, `%USERPROFILE%\.dsh\profiles\web` on Windows):
+
+```bash
+pnpm install
+```
 
 ```yaml
+# cordis.patch.yml
 - insert:
     - id: mobile-remote
       name: dsh-mobile-remote
       config:
-        token: 你的token
+        token: your-token
 ```
 
-## 接入 host composition（安装步骤）
+3. Restart Harness.
 
-1. 在 profile（`C:\Users\<你>\.dsh\profiles\web`）的 `package.json` 里加依赖：
+## Configuration
 
-```json
-"dependencies": {
-  "dsh-mobile-remote": "file:D:/Yang/deepseek-harness/dsh-mobile-remote"
-}
+| Field | Default | Description |
+| --- | --- | --- |
+| `token` | `mob-9e7c5a3b1f` | Shared secret required as `?t=` on every route. **Change it.** |
+
+## Usage
+
+Same machine:
+
+```
+http://127.0.0.1:3080/m?t=<token>
 ```
 
-2. 在 profile 目录运行 `pnpm install`。
-3. 在 `cordis.patch.yml` 里加挂载行（见上文「配置」）。
-4. 重启 harness。
+Phone (Tailscale, recommended):
 
-> 改动 `D:\Yang\deepseek-harness\dsh-mobile-remote` 源码后，需在 profile 目录重新运行 `pnpm install` 同步（node_modules 里是安装快照，非实时链接）。
-
-## 数据来源
-
-- 会话列表来自 `sessionQuery.listSessions()`（含冷会话）。
-- 目标从 `goal/change` 事件折叠，待办从 `todo/write`，动态从 `user/message` / `assistant/message` / `tool/call`；冷会话通过 `sessionQuery.readSession()` 读取持久化日志。
-- 发送提示仅对「已挂载（live）」会话有效（走 `agent.followup`）；冷会话需先在电脑 web 端打开才会挂载。
-
-## 网络通路（Tailscale）
-
-harness 默认只监听 `127.0.0.1:3080`，手机远程访问需打通通路（本插件不负责改监听地址）。推荐用已装的 Tailscale（需管理员 PowerShell）：
-
-```powershell
+```bash
 tailscale serve --bg 3080
-tailscale serve status
+tailscale serve status   # prints the https URL
 ```
 
-手机装 Tailscale 并登录同一账户（同一 tailnet），打开：
-
 ```
-https://<serve status 给出的地址>/m?t=mob-9e7c5a3b1f
+https://<machine>.<tailnet>.ts.net/m?t=<token>
 ```
 
-`tailscale serve` 默认仅限你的 tailnet 内访问，不会暴露到公网（不要用 `funnel`）。
+## How it works
 
-## 安全
+- Session list: `sessionQuery.listSessions()` (includes cold sessions) + `readTitleSnapshots()`.
+- Goals fold from `goal/change`; todos from `todo/write`; activity from `user/message`, `assistant/message`, `tool/call` events. Cold sessions read via `sessionQuery.readSession()`.
+- Prompts: `agent.followup()` — the same path as the web client.
+- Mount: `agents.resume()` with the session's agent preset re-mounted.
 
-- token 会出现在 URL 中，可能留在浏览器历史里；如需更强可改成 Basic Auth 或 header 认证。
-- 只对「已挂载」会话生效；冷会话不会被自动唤醒。
+## Security
+
+- Change the default token before exposing the port.
+- `tailscale serve` is tailnet-only. Do **not** use `tailscale funnel` (public internet) without additional auth.
+- Cold sessions are never resumed automatically — you must tap them first.
+
+## Requirements
+
+- Node.js (ESM)
+- DeepSeek Harness (provides `webServer`, `agents`, `sessionQuery`, `agentPresets`)
+
+## License
+
+MIT

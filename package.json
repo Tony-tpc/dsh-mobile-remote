@@ -1,7 +1,7 @@
 {
   "name": "dsh-mobile-remote",
-  "description": "DSH 手机远程插件：在 harness 的 3080 端口提供 /m 移动端页面，查看全部会话(含冷会话)的状态/目标/待办/最近动态，并从手机发送提示注入已挂载会话。",
-  "version": "1.1.0",
+  "description": "Mobile remote console for DeepSeek Harness: view sessions, goals, todos and recent activity, and send prompts from your phone.",
+  "version": "1.2.0",
   "license": "MIT",
   "type": "module",
   "main": "lib/index.js",
@@ -11,13 +11,21 @@
   },
   "files": [
     "lib/index.js",
-    "README.md"
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md"
   ],
   "keywords": [
     "dsh",
+    "dsh-plugin",
     "deepseek-harness",
     "plugin",
     "mobile",
     "remote"
-  ]
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
 }

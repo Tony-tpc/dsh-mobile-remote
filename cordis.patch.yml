@@ -1,0 +1,8 @@
+# Self-registration patch: when this package is added as a bundle
+# (via `dsh plugin add`, or listed in dsh.profile.bundles), this inserts
+# the host row into the composition.
+- insert:
+    - id: mobile-remote
+      name: dsh-mobile-remote
+      config:
+        token: mob-9e7c5a3b1f
