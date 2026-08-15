@@ -1,5 +1,7 @@
 # dsh-mobile-remote
 
+> 🌐 [English](README.md) · 仓库：<https://github.com/Tony-tpc/dsh-mobile-remote>
+
 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 手机远程控制插件：在手机上查看会话、目标、待办、最近动态，并向 agent 发送提示。
 
 ## 特性
@@ -17,7 +19,7 @@
 ### 通过 `dsh plugin`
 
 ```bash
-dsh plugin --profile web add <spec>   # 例如 github:<user>/dsh-mobile-remote
+dsh plugin --profile web add github:Tony-tpc/dsh-mobile-remote
 ```
 
 包内自带 `dsh.bundle.patch`（`cordis.patch.yml`），作为 bundle 添加时自动注册宿主行。

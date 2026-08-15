@@ -1,5 +1,7 @@
 # dsh-mobile-remote
 
+> 🌐 [中文](README.zh.md) · Repository: <https://github.com/Tony-tpc/dsh-mobile-remote>
+
 A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin that adds a mobile remote console — view sessions, goals, todos and recent activity, and send prompts to the agent from your phone.
 
 ## Features
@@ -17,7 +19,7 @@ A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin tha
 ### Via `dsh plugin`
 
 ```bash
-dsh plugin --profile web add <spec>   # e.g. github:<user>/dsh-mobile-remote
+dsh plugin --profile web add github:Tony-tpc/dsh-mobile-remote
 ```
 
 The package ships a `dsh.bundle.patch` (`cordis.patch.yml`), so adding it as a bundle self-registers the host row.
